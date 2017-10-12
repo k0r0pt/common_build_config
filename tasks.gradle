@@ -1,0 +1,57 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'maven'
+apply plugin: 'checkstyle'
+
+sourceCompatibility = 1.8
+
+checkstyle {
+    configFile = file("$rootDir/build_config/checkstyle.xml")
+    toolVersion = 8.2
+}
+checkstyleMain {
+    source = fileTree(dir: 'src/main', include: '**/*.java')
+}
+checkstyleTest {
+    source = fileTree(dir: 'src/test', include: '**/*.java')
+}
+
+task jarSources(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'source'
+}
+
+task testJar(type: Jar) {
+    from sourceSets.test.output
+    classifier = 'tests'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId = project.group
+            artifactId = project.name
+            version = project.version
+            from components.java
+            artifact jarSources
+        }
+    }
+}
+
+build {
+    dependsOn testJar
+    dependsOn install
+}
+
+test {
+    testLogging {
+        useJUnit()
+        exceptionFormat = 'full'
+        afterSuite { desc, result ->
+            if (desc.className) { // will match the outermost suite
+                println "\n Test Suite: " + desc.className
+                println "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} successes, ${result.failedTestCount} failures, ${result.skippedTestCount} skipped)\n"
+            }
+        }
+    }
+}
