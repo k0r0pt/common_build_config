@@ -26,6 +26,12 @@ task testJar(type: Jar) {
     classifier = 'tests'
 }
 
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
