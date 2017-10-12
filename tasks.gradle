@@ -2,6 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'maven'
 apply plugin: 'checkstyle'
+apply plugin: 'jacoco'
 
 sourceCompatibility = 1.8
 
