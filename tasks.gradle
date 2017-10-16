@@ -52,7 +52,7 @@ build {
 
 test {
     testLogging {
-        showStandardStreams = true
+        // showStandardStreams = true
         useJUnit()
         exceptionFormat = 'full'
         afterSuite { desc, result ->
