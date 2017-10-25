@@ -3,6 +3,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'maven'
 apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.8
 
@@ -30,7 +31,9 @@ task testJar(type: Jar) {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven { url 'https://jitpack.io' }
+    maven {
+        url  "https://dl.bintray.com/sudiptosarkar/maven"
+    }
 }
 
 publishing {
@@ -42,6 +45,24 @@ publishing {
             from components.java
             artifact jarSources
         }
+        maven(MavenPublication) {
+            from components.java
+            pom.withXml {
+                asNode().dependencies.'*'.findAll() {
+                    it.scope.text() == 'runtime' && project.configurations.compile.allDependencies.find { dep ->
+                        dep.name == it.artifactId.text()
+                    }
+                }.each() {
+                    it.scope*.value = 'compile'
+                }
+            }
+        }
+    }
+}
+
+model {
+    tasks.generatePomFileForMavenPublication {
+        destination = file("$buildDir/libs/" + rootProject.name + "-" + rootProject.version + ".pom")
     }
 }
 
